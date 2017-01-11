@@ -110,7 +110,7 @@
 
 
 
-\begin{frame}[fragile]{Starting with git}
+\begin{frame}[fragile]{Starting a project}
 \begin{itemize}
 \item To start a git project in an existing directory:
 \end{itemize}
@@ -118,11 +118,17 @@
 git init
 \end{lstlisting}
 \begin{itemize}
+	\item A .git folder will be added that contains the information git needs
+\end{itemize}
+\begin{itemize}
 \item Files can be added with:
 \end{itemize}
 \begin{lstlisting}[language=bash, escapeinside={<@}{@>}]
 git add myexamplefile.txt
 \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Cloning from a server}
 \begin{itemize}
 \item To get a copy from a project that is located on a remote repository (like github or bitbucket):
 \end{itemize}
@@ -186,6 +192,13 @@ git commit
 \end{figure}
 \end{frame}
 
+\begin{frame}[fragile]{Basic work flow}
+	\begin{itemize}
+		\item \texttt{git log} Shows you the commit history 
+		\item \texttt{git checkout <commit>} let's you go back to an old commit
+		\item The argument to this function is the SHA-1 hash that uniquely defines the commit
+	\end{itemize}
+\end{frame}
 
 
 \begin{frame}[fragile]{Basic work flow}
@@ -199,14 +212,16 @@ git commit
 \item \texttt{git diff} shows you differences
 \begin{itemize}
 \item \texttt{git diff}: differences between working directory and index
-\item \texttt{git diff --staged}: differences between index and HEAD
+\item \texttt{git diff --staged}: differences between index and HEAD 
+\item \texttt{git diff HEAD}:  differences between your working directory and HEAD
 \item We can also compare with an other commits or compare commits with each other
 \end{itemize}
 
 \end{itemize}
 \end{frame}
 
-\section{Branches and merging}
+
+ \section{Branches and merging}
 
 \begin{frame}[fragile]{Branches}
 \begin{itemize}
@@ -318,7 +333,7 @@ git commit
 
 \begin{frame}[fragile]{Merging}
 	\begin{itemize}
-		\item Oftena fast-forward merge is not possible and a separate commit has to be used to combine the histories
+		\item Often fast-forward merge is not possible and a separate commit has to be used to combine the histories
 		\item When the two branches have modified the same part of a file git does not know which change to accept. This is called a \textbf{\attention{merge conflict}}. You have to resolve this conflict yourself. 
 	\end{itemize}
 \end{frame}
@@ -351,6 +366,80 @@ git commit
 		\end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Rebase}
+	\begin{itemize}
+		\item \texttt{\attention{git rebase}} forms an alternative to merge
+		\item It applies changes made in a branch and applies them to an other branch
+	\end{itemize}
+ \begin{alertblock}{Warning}
+	\textbf{Rebase} changes your history so use with care
+\end{alertblock}
+
+\end{frame}
+
+\begin{frame}[fragile]{Rebase}
+\begin{figure}
+		\centering
+		\begin{tikzpicture}
+		% Commit DAG
+		\gitDAG[grow right sep = 2em]{
+			A -- B -- { 
+				C,
+				D -- E,
+			}
+		};
+		% Tag reference
+		% Branch
+		\gitbranch
+		{feature}     % node name and text 
+		{above=of E} % node placement
+		{E}          % target
+		\gitbranch
+		{master}     % node name and text 
+		{above=of C} % node placement
+		{C}          % target
+		% HEAD reference
+		\gitHEAD
+		{above=of master} % node placement
+		{master}          % target
+		\end{tikzpicture}
+		\caption{Before\ldots}
+
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Rebase}
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+	% Commit DAG
+	\gitDAG[grow right sep = 2em]{
+	 A -- B -- { 
+		C -- D' -- E',
+		{[nodes=unreachable] D -- E },
+	}
+};
+	% Tag reference
+	% Branch
+	\gitbranch
+	{feature}     % node name and text 
+	{above=of E'} % node placement
+	{E'}          % target
+	\gitbranch
+	{master}     % node name and text 
+	{above=of C} % node placement
+	{C}          % target
+	% HEAD reference
+	\gitHEAD
+	{above=of master} % node placement
+	{master}          % target
+	\end{tikzpicture}
+	\caption{\ldots and after}
+	
+\end{figure}
+\end{frame}
+
+
 \section{Remote branches}
 
 \begin{frame}[fragile]{Working with a remote repository}
@@ -371,9 +460,49 @@ git commit
 	\begin{itemize}
     \item git diff: Show differences between your working directory and the index.
     \item git diff –cached: Show differences between the index and the most recent commit.
-    \item git diff HEAD: Show the differences between your working directory and the most recent commit.
+    \item git apply: Go back to a stored state
 	\end{itemize}	
 \end{frame}	
 
+\section{Other commands}
+
+\begin{frame}{Git stash}
+	\begin{itemize}
+		\item \textbf{\texttt{git stash}}: Stores state of working directory and then go back to a clean state
+		\item \textbf{\texttt{git stash list}}: Show stored states
+		\item \textbf{\texttt{git stash apply}}: Go back to a stored state
+	\end{itemize}	
+\end{frame}	
+
+\begin{frame}{Git reset}
+	\begin{itemize}
+		\item \textbf{\texttt{git reset --soft <commit>}}: Moves HEAD to another commit
+		\item \textbf{\texttt{git reset --mixed <commit>}}: Moves HEAD to another commit and updates the index (to new HEAD) (this is the default)
+		\item \textbf{\texttt{git reset --hard <commit>}}: Like the previous but also resets the working directory
+	\end{itemize}	
+\end{frame}	
+
+\begin{frame}{Git rm}
+	\begin{itemize}
+		\item \textbf{\texttt{git rm  <file>}}: removes a file from the working directory and the index (it is no longer under version control)
+		\item \textbf{\texttt{git rm <file>}}: Stage file for deletion but keep in working directory
+	\end{itemize}	
+\end{frame}	
+
+\section{Discussion points}
+
+\begin{frame}{Points for discussion}
+	\begin{itemize}
+		\item Git does not play along nicely with latex paragraphs
+		\item Hard to make single topic commits with clear commit messages
+		\item Should results be kept (what if the computations take a long time)
+		\item What about the input / data files
+		\item Different variants of a program within a branch?
+		\item What to do with MS Word files etc
+		\item Should we think about a standard work-flow?
+		\item Do we need our own git server
+		\item ... 
+	\end{itemize}	
+\end{frame}	
 
 \end{document}
