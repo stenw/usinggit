@@ -17,6 +17,11 @@
 \usepackage{listings}
 \usepackage{gitdags}
 \usepackage{textcomp}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, calc}
+
+
 \lstset{basicstyle=\ttfamily,
 	showstringspaces=false,
 	commentstyle=\color{red},
@@ -118,7 +123,7 @@
 git init
 \end{lstlisting}
 \begin{itemize}
-	\item A .git folder will be added that contains the information git needs
+	\item A \attention{.git} folder will be added that contains the information git needs
 \end{itemize}
 \begin{itemize}
 \item Files can be added with:
@@ -218,6 +223,23 @@ git commit
 \end{itemize}
 
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic work flow}
+	\def\blockdist{2.3cm}
+	\begin{tikzpicture}
+	\node (A) [text width=\blockdist, draw, fill= emclblue!20, minimum height=2cm, minimum width=5cm] {\Large HEAD};
+	\path (A.0)+(0,-2*\blockdist) node (WD)[rectangle, draw, fill= emclblue!20, text width=\blockdist,  minimum width=6cm] {\large Working Directory};
+	\path (A.180)+(0,-\blockdist) node (I)[rectangle, draw, fill= emclblue!20, text width= 3cm, minimum width=6cm] {\large Index};
+	\coordinate (aid1) at (A.south);
+	\coordinate (aid2) at (I.south);
+	\coordinate (aid3) at (WD.north);
+	\coordinate (aid4) at (aid1 |- aid2) ;
+	\coordinate (aid5) at (aid1 |- aid3) ;
+	\draw [->, ultra thick] (A.south east) -- (WD) node [pos=0.5, right] (lab1) {git diff --HEAD};
+	\draw [->, ultra thick] (A.south west) -- (I) node [pos=0.5, left] (lab2) {git diff --staged};
+	\draw [->, ultra thick] (aid4) -- (aid5) node [pos=0.5, left] (lab3) {git diff };	
+	\end{tikzpicture}
 \end{frame}
 
 
@@ -339,9 +361,19 @@ git commit
 \end{frame}
 
 \begin{frame}
-	\begin{center}
-		\includegraphics[width=\linewidth]{Merge}
-	\end{center}
+\begin{tikzpicture}
+\tikzstyle{commit} = [fill=blue!20, circle]
+\node (S1) [draw, DAGcommit, label=left:{Initial commit}] {};
+\node (S2) [below=of S1,   DAGcommit, label=left:{Sten does some work}] {};
+\node (S3) [below=of S2, DAGcommit, label=left:{\begin{tabular}{r} Sten implements \\ a cool feature\end{tabular}}] {};
+\node (S4) [below=of S3, DAGcommit, label=left:{Merge}] {};
+\node (C1) [below right=of S2, DAGcommit, label=right:{\begin{tabular}{l}Cibele corrects \\  mistake \end{tabular}}] {};
+\draw [DAGedge] (S1) -- (S2) ;
+\draw [DAGedge] (S2) -- (S3) ;
+\draw [DAGedge] (S3) -- (S4) ;
+\draw [DAGedge] (S2) -- (C1) ;
+\draw [DAGedge] (C1) -- (S4) ;
+\end{tikzpicture}
 \end{frame}
 
 \begin{frame}[fragile]{Manually merging}
